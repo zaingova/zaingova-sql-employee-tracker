@@ -1,6 +1,7 @@
 const inquirer = require('inquirer');
 const mysql = require('mysql2');
 const { printTable } = require('console-table-printer');
+const title = require('./assets/ascii/title');
 
 // establish connection to MySQL database
 const db = mysql.createConnection(
@@ -54,6 +55,7 @@ getUserChoice = (() => {
 
     // executes response based on user input
     .then((response) => {
+      console.clear();
       if (response.response == 'View all departments') {
         viewAllDepartments();
       }
@@ -74,31 +76,36 @@ getUserChoice = (() => {
 
 // displays a table containing all the departments and department IDs
 viewAllDepartments = (() => {
-  db.query("SELECT id as ID, name as Department_Name FROM department", (err, result) => {
+  db.query("SELECT id as 'Department ID', name as 'Department Name' FROM department", (err, result) => {
     if (err) {
-      console.log("Connection unsuccessful")
+      console.log(err)
     } else {
-      printTable(result);
-      getUserChoice();
+      // calls showTable function if !err
+      showTable(result);
     }
   })
 })
 
 // displays a table containing all the roles, role IDs, the department that role belongs to, and the salary for that role
 viewAllRoles = (() => {
-  db.query("SELECT id as ID, name as Department_Name FROM department", (err, result) => {
+  db.query("SELECT role.id as 'Role ID', role.title as 'Role Title', department.name as 'Department Name', role.salary as Salary FROM role LEFT JOIN department ON role.department_id = department.id", (err, result) => {
     if (err) {
-      console.log("Connection unsuccessful")
+      console.log(err)
     } else {
-      printTable(result);
-      getUserChoice();
+      showTable(result);
     }
   })
 })
 
 // displays a table containing all employees information, including employee IDs, first names, last names, job titles, departments, salaries, and managers that the employees report to
 viewAllEmployees = (() => {
-  getUserChoice();
+  db.query("SELECT employee.id as 'Employee ID', employee.first_name as 'First Name', employee.last_name as 'Last Name', role.title as 'Role Title', department.name as Department, role.salary as Salary, employee.manager_id FROM employee LEFT JOIN role ON employee.role_id = role.id LEFT JOIN department ON role.department_id = department.id", (err, result) => {
+    if (err) {
+      console.log(err)
+    } else {
+      showTable(result);
+    }
+  })
 })
 
 // the user is prompted to enter a department name, and that department is added to the database
@@ -121,10 +128,13 @@ updateEmployeeRole = (() => {
   getUserChoice();
 })
 
+showTable = ((data) => {
+  console.log('\n');
+  printTable(data);
+  console.log('\n');
+  getUserChoice();
+})
+
 // calls getUserChoice function by default
-console.log(`
-888888 8b    d8 88""Yb 88      dP"Yb  Yb  dP 888888 888888     8b    d8    db    88b 88    db     dP""b8 888888 88""Yb 
-88__   88b  d88 88__dP 88     dP   Yb  YbdP  88__   88__       88b  d88   dPYb   88Yb88   dPYb   dP   '" 88__   88__dP 
-88""   88YbdP88 88"""  88  .o Yb   dP   8P   88""   88""       88YbdP88  dP__Yb  88 Y88  dP__Yb  Yb  "88 88""   88"Yb  
-888888 88 YY 88 88     88ood8  YbodP   dP    888888 888888     88 YY 88 dP""""Yb 88  Y8 dP""""Yb  YboodP 888888 88  Yb.\n`)
+console.log(title);
 getUserChoice();
