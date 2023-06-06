@@ -14,8 +14,10 @@ VALUES
 ('Lawyer', 120000, 3),
 ('Marketing Lead', 95000, 4);
 
--- INSERT INTO employee (first_name, last_name)
--- VALUES 
--- ('John', 'Doe'),
--- ('Michael', 'Smith'),
--- ('Robert', 'Lowe');
+INSERT INTO employee (first_name, last_name, role_id, manager_id)
+VALUES 
+('John', 'Doe', 2, 1),
+('Michael', 'Smith', 1, null),
+('Robert', 'Lowe', 1, 1),
+('Jean', 'Brandt', 4, null),
+('Patty', 'Lane', 5, 3);

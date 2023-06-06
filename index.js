@@ -99,7 +99,7 @@ viewAllRoles = (() => {
 
 // displays a table containing all employees information, including employee IDs, first names, last names, job titles, departments, salaries, and managers that the employees report to
 viewAllEmployees = (() => {
-  db.query("SELECT employee.id as 'Employee ID', employee.first_name as 'First Name', employee.last_name as 'Last Name', role.title as 'Role Title', department.name as Department, role.salary as Salary, employee.manager_id FROM employee LEFT JOIN role ON employee.role_id = role.id LEFT JOIN department ON role.department_id = department.id", (err, result) => {
+  db.query("SELECT employee.id as 'Employee ID', employee.first_name as 'First Name', employee.last_name as 'Last Name', role.title as 'Role Title', department.name as Department, role.salary as Salary, CONCAT(employee.first_name, ' ', employee.last_name) as Manager FROM employee LEFT JOIN role ON employee.role_id = role.id INNER JOIN department ON role.department_id = department.id", (err, result) => {
     if (err) {
       console.log(err)
     } else {
