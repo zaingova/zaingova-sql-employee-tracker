@@ -1,5 +1,6 @@
 const inquirer = require('inquirer');
 const mysql = require('mysql2');
+const { printTable } = require('console-table-printer');
 
 // establish connection to MySQL database
 const db = mysql.createConnection(
@@ -16,7 +17,8 @@ const db = mysql.createConnection(
 db.connect();
 
 // list of all possible questions to ask the user
-const questions = ['What would you like to do?',
+const questions = [
+  'What would you like to do?',
   "What is the name of the department?",
   "What is the name of the role?",
   "What is the salary of the role?",
@@ -38,7 +40,8 @@ getUserChoice = (() => {
         type: 'list',
         name: 'response',
         message: questions[0],
-        choices: ['View all departments',
+        choices: [
+          'View all departments',
           'View all roles',
           'View all employees',
           'Add department',
@@ -49,9 +52,11 @@ getUserChoice = (() => {
       }
     ])
 
+    // executes response based on user input
     .then((response) => {
-      if (response.response == 'View all departments')
+      if (response.response == 'View all departments') {
         viewAllDepartments();
+      }
       else if (response.response == 'View all roles')
         viewAllRoles();
       else if (response.response == 'View all employees')
@@ -69,17 +74,26 @@ getUserChoice = (() => {
 
 // displays a table containing all the departments and department IDs
 viewAllDepartments = (() => {
-  db.query("SELECT name as Department_Name, id as Department_ID FROM department", (err, result) => {
-    err ? console.log("Connection unsuccessful") : console.log(result);
-  });
-
-  //getUserChoice();
+  db.query("SELECT id as ID, name as Department_Name FROM department", (err, result) => {
+    if (err) {
+      console.log("Connection unsuccessful")
+    } else {
+      printTable(result);
+      getUserChoice();
+    }
+  })
 })
-
 
 // displays a table containing all the roles, role IDs, the department that role belongs to, and the salary for that role
 viewAllRoles = (() => {
-  getUserChoice();
+  db.query("SELECT id as ID, name as Department_Name FROM department", (err, result) => {
+    if (err) {
+      console.log("Connection unsuccessful")
+    } else {
+      printTable(result);
+      getUserChoice();
+    }
+  })
 })
 
 // displays a table containing all employees information, including employee IDs, first names, last names, job titles, departments, salaries, and managers that the employees report to
@@ -108,13 +122,9 @@ updateEmployeeRole = (() => {
 })
 
 // calls getUserChoice function by default
-console.log(`  ___                  _                          
- | __|  _ __    _ __  | |  ___   _  _   ___   ___ 
- | _|  | '  \\  | '_ \\ | | / _ \\ | || | / -_) / -_)
- |___| |_|_|_| | .__/ |_| \\___/  \\_, | \\___| \\___|
-  _____        |_|          _    |__/             
- |_   _|  _ _   __ _   __  | |__  ___   _ _       
-   | |   | '_| / _  | / _| | / / / -_) | '_|      
-   |_|   |_|   \\__,_| \\__| |_\\_\\ \\___| |_|        
-                                                  `)
+console.log(`
+888888 8b    d8 88""Yb 88      dP"Yb  Yb  dP 888888 888888     8b    d8    db    88b 88    db     dP""b8 888888 88""Yb 
+88__   88b  d88 88__dP 88     dP   Yb  YbdP  88__   88__       88b  d88   dPYb   88Yb88   dPYb   dP   '" 88__   88__dP 
+88""   88YbdP88 88"""  88  .o Yb   dP   8P   88""   88""       88YbdP88  dP__Yb  88 Y88  dP__Yb  Yb  "88 88""   88"Yb  
+888888 88 YY 88 88     88ood8  YbodP   dP    888888 888888     88 YY 88 dP""""Yb 88  Y8 dP""""Yb  YboodP 888888 88  Yb.\n`)
 getUserChoice();
