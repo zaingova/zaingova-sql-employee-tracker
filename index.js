@@ -82,6 +82,7 @@ viewAllDepartments = (() => {
     } else {
       // calls showTable function if !err
       showTable(result);
+      getUserChoice();
     }
   })
 })
@@ -93,30 +94,110 @@ viewAllRoles = (() => {
       console.log(err)
     } else {
       showTable(result);
+      getUserChoice();
     }
   })
 })
 
 // displays a table containing all employees information, including employee IDs, first names, last names, job titles, departments, salaries, and managers that the employees report to
 viewAllEmployees = (() => {
-  db.query("SELECT e.id as 'Employee ID', e.first_name as 'First Name', e.last_name as 'Last Name', role.title as 'Role Title', department.name as Department, role.salary as Salary, CONCAT(m.first_name, ' ', m.last_name) as Manager, e.manager_id as 'Manager ID' FROM employee e INNER JOIN role ON e.role_id = role.id INNER JOIN department ON role.department_id = department.id LEFT OUTER JOIN employee m ON e.manager_id = m.id", (err, result) => {
+  db.query("SELECT e.id as 'Employee ID', e.first_name as 'First Name', e.last_name as 'Last Name', role.title as 'Role Title', department.name as Department, role.salary as Salary, CONCAT(m.first_name, ' ', m.last_name) as Manager FROM employee e JOIN role ON e.role_id = role.id JOIN department ON role.department_id = department.id LEFT OUTER JOIN employee m ON e.manager_id = m.id", (err, result) => {
     if (err) {
       console.log(err)
     } else {
       showTable(result);
+      getUserChoice();
     }
   })
 })
 
 // the user is prompted to enter a department name, and that department is added to the database
 addDepartment = (() => {
-  getUserChoice();
+
+  inquirer
+    .prompt([
+      {
+        type: 'input',
+        name: 'response',
+        message: 'Which department would you like to add? (3-character minimum)',
+
+        validate: function (input) {
+          if (input.length < 3)
+            throw new Error('Please enter a department with a valid length!');
+          return true;
+        }
+      }
+    ])
+    .then((response) => {
+      console.log(response.response);
+      db.query(`INSERT INTO department (name) VALUES ('${response.response}');`, (err, result) => {
+        if (err) {
+          console.log(err)
+        } else {
+          getUserChoice();
+        }
+      })
+    })
+
+
 })
 
 // the user is prompted to enter the name, salary, and department for the role and that role is added to the database
-addRole = (() => {
-  getUserChoice();
-})
+addRole = () => {
+  db.query('SELECT * FROM department', (err, response) => {
+    const depts = [];
+
+    for (let i = 0; i < response.length; i++) {
+      depts.push(response[i].name);
+    }
+
+    inquirer
+      .prompt([
+        {
+          type: 'input',
+          name: 'roleName',
+          message: 'What role would you like to add? (3-character minimum)',
+          validate: function (data) {
+            if (data.length < 3)
+              throw new Error('Input must be at least 3 characters long!');
+            return true;
+          }
+        },
+        {
+          type: 'input',
+          name: 'roleSalary',
+          message: 'What will be the salary?',
+          validate: function (data) {
+            if (isNaN(data))
+              throw new Error('Salary data must be a number!');
+            return true;
+          }
+        },
+        {
+          type: 'list',
+          name: 'deptName',
+          message: 'Which department would you like to add this role to?',
+          choices: depts
+        }
+      ])
+      .then((data) => {
+        let deptId;
+
+        for (let i = 0; i < response.length; i++) {
+          if (data.deptName == response[i].name)
+            deptId = i + 1;
+        }
+
+        db.query(`INSERT INTO role (title, salary, department_id) VALUES ('${data.roleName}', ${data.roleSalary}, ${deptId});`, (err, result) => {
+          if (err) {
+            console.log(err)
+          } else {
+            viewAllRoles();
+          }
+        })
+      })
+  })
+};
 
 // the user is prompted to enter the employee’s first name, last name, role, and manager, and that employee is added to the database
 addEmployee = (() => {
@@ -132,7 +213,6 @@ showTable = ((data) => {
   console.log('\n');
   printTable(data);
   console.log('\n');
-  getUserChoice();
 })
 
 // calls getUserChoice function by default
