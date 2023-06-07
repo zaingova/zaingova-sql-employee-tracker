@@ -10,10 +10,13 @@ This is a command-line application that lets employers manager their employees, 
 
 Demo screen-shots of the working application
 
+
+https://github.com/zaingova/zaingova-sql-employee-tracker/assets/127261218/3d4ea496-5202-4556-8789-274777552b17
+
+
 ![demo-1](./assets/media/demo-shot-3.png)
 ![demo-2](./assets/media/demo-shot-1.png)
 ![demo-3](./assets/media/demo-shot-2.png)
-https://github.com/zaingova/zaingova-sql-employee-tracker/assets/127261218/5d3b3459-0758-4835-afe2-1c3b523b8afa
 
 ## Resources
 
