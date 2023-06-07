@@ -322,8 +322,6 @@ updateEmployeeRole = (() => {
       (({ id, first_name, last_name }) =>
         ({ name: first_name + " " + last_name, id: id }));
 
-    console.log(employees);
-
     inquirer
       .prompt([
         {
@@ -351,8 +349,6 @@ updateEmployeeRole = (() => {
           for (let i = 0; i < roles.length; i++) {
             roleTitles.push(roles[i].title);
           }
-
-          //console.log(roleTitles);
 
           inquirer
             .prompt([
