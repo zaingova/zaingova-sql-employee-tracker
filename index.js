@@ -360,6 +360,7 @@ updateEmployeeRole = (() => {
               }
             ])
             .then((data) => {
+              // sets role Id according to selection
               let roleId;
               for (let i = 0; i < roles.length; i++) {
                 if (data.role == roles[i].title) {
@@ -367,11 +368,12 @@ updateEmployeeRole = (() => {
                 }
               }
 
+              // updates employee with employeeId
               db.query(`UPDATE employee SET role_id = ${roleId} WHERE employee.id = ${employeeId}`, (err, response) => {
                 if (err) {
                   console.log(err)
                 } else {
-                  // displays an updated table containing roles
+                  // displays an updated table containing employees
                   viewAllEmployees();
                 }
               })
